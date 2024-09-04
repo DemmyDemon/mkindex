@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Images</title>
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                background: #030303;
+            }
+            article {
+                width: 100vw;
+                height: 100vh;
+            }
+            img {
+                margin: 0 auto;
+                display: block;
+                height: 100vh;
+                width: 100vw;
+                object-fit: contain;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
+
+        <article>
+            <img id="display" src="" loading="lazy">
+        </article>
+
+        <script>
+            function setImg(index) {
+                const display = document.querySelector("#display");
+                display.src = images[index]
+
+            }
+            let x0 = null;
+            let offset = 0;
+            function normalize(e) { return e.changedTouches ? e.changedTouches[0] : e };
+            function lock(e) { x0 = normalize(e).clientX };
+            function move(e) {
+                if (x0 || x0 === 0) {
+                    let dx = normalize(e).clientX - x0
+                    let s = Math.sign(dx)
+                    x0 = null
+                    if (s < 0) {
+                        next();
+                    } else {
+                        previous();
+                    }
+                }
+            }
+            function next() {
+                let was = offset;
+                offset += 1;
+                if (offset >= images.length){
+                    offset = images.length -1
+                }
+                if (offset != was) {
+                    setImg(offset)
+                }
+            }
+            function previous() {
+                let was = offset;
+                offset -= 1;
+                if (offset < 0) {
+                    offset = 0
+                }
+                if (offset != was) {
+                    setImg(offset)
+                }                
+            }
+            const ar = document.querySelector("article")
+            ar.addEventListener("touchmove", (e)=> {e.preventDefault()}, false)
+            ar.addEventListener("mousedown", lock, false)
+            ar.addEventListener("touchstart", lock, false)
+            ar.addEventListener("mouseup", move, false)
+            ar.addEventListener("touchend", move, false)
+            document.addEventListener("keydown", (e) => {
+                switch (e.keyCode) {
+                    case 37:
+                        e.preventDefault();
+                        previous();
+                        break;
+                    case 39:
+                        e.preventDefault();
+                        next();
+                        break;
+                }
+            }, false);
+            let images = [
+                /*{{ range $i, $file := . -}}  {{$i}}*/
+                "{{ $file }}",
+                /*{{ end }}End*/
+            ]
+            setImg(0);
+        </script>
+    </body>
+</html>
