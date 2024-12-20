@@ -15,27 +15,69 @@
                 width: 100vw;
                 height: 100vh;
             }
-            img {
+            footer {
+                width: 100vw;
+                font-size: 2vh;
+                height: 2em;
+                bottom: 0;
+                color: #FFFFFF33;
                 margin: 0 auto;
+                margin-top: -2.5em;
+                display: block;
+                text-align: center;
+                text-shadow: 0px 1px 5px #00000033;
+                pointer-events: none;
+                overflow: hidden;
+            }
+            img {
+                margin: 0; /* auto; */
                 display: block;
                 height: 100vh;
                 width: 100vw;
                 object-fit: contain;
                 pointer-events: none;
             }
+            #name {
+                font-size: 0.75em;
+            }
         </style>
     </head>
     <body>
 
         <article>
-            <img id="display" src="" loading="lazy">
+            <img id="display" src="">
         </article>
-
+        <footer>
+            <div id="count"></div>
+            <div id="name"></div>
+        </footer>
         <script>
             function setImg(index) {
                 const display = document.querySelector("#display");
-                display.src = images[index]
+                display.src = images[index];
+                
+                const count = document.querySelector("#count");
+                count.textContent = (index+1) + "/" + images.length
 
+                const name = document.querySelector("#name");
+                name.textContent = images[index];
+
+                window.location.hash = images[index];
+
+            }
+            function preload() {
+                for (const image of images) {
+                    const img = new Image();
+                    img.src = image;
+                }
+            }
+            function getInitialHashIndex() {
+                for (let i = 0; i < images.length; i++) {
+                    if ("#" + images[i] == window.location.hash) {
+                        return i;
+                    }
+                }
+                return 0;
             }
             let x0 = null;
             let offset = 0;
@@ -57,7 +99,7 @@
                 let was = offset;
                 offset += 1;
                 if (offset >= images.length){
-                    offset = images.length -1
+                    offset = 0
                 }
                 if (offset != was) {
                     setImg(offset)
@@ -67,7 +109,7 @@
                 let was = offset;
                 offset -= 1;
                 if (offset < 0) {
-                    offset = 0
+                    offset = images.length - 1
                 }
                 if (offset != was) {
                     setImg(offset)
@@ -82,21 +124,29 @@
             document.addEventListener("keydown", (e) => {
                 switch (e.keyCode) {
                     case 37:
+                        if (e.altKey) {
+                            return;
+                        }
                         e.preventDefault();
                         previous();
                         break;
                     case 39:
+                        if (e.altKey) {
+                            return;
+                        }
                         e.preventDefault();
                         next();
                         break;
                 }
             }, false);
-            let images = [
+            const images = [
                 /*{{ range $i, $file := . -}}  {{$i}}*/
                 "{{ $file }}",
                 /*{{ end }}End*/
             ]
-            setImg(0);
+            preload();
+            const idx = getInitialHashIndex();
+            setImg(idx);
         </script>
     </body>
 </html>
